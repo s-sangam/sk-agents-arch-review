@@ -1,35 +1,41 @@
-🏛️ Architecture Review Orchestrator
-This project demonstrates an intelligent architecture review system built using Semantic Kernel (SK), leveraging its latest Agent framework, SequentialPlanner, and various plugins to automate the process of analyzing design documents, validating their structure, assessing security, and consolidating findings into a comprehensive report.
+````markdown
+# 🏛️ Architecture Review Orchestrator
 
-🌟 Project Overview
+This project demonstrates an intelligent architecture review system built using **Semantic Kernel (SK)**, leveraging its latest `Agent` framework, `SequentialPlanner`, and various plugins to automate the process of analyzing design documents, validating their structure, assessing security, and consolidating findings into a comprehensive report.
+
+## 🌟 Project Overview
+
 The Architecture Review Orchestrator aims to streamline the often complex and multi-faceted task of reviewing technical design documents. It simulates a team of specialized AI agents working collaboratively under an orchestration layer to perform distinct review functions.
 
-Key Capabilities:
+**Key Capabilities:**
 
-Document Processing: Extracts and summarizes content from design documents (e.g., PDFs).
+* **Document Processing:** Extracts and summarizes content from design documents (e.g., PDFs).
 
-Structural Validation: Checks the document's adherence to predefined architectural structural rules.
+* **Structural Validation:** Checks the document's adherence to predefined architectural structural rules.
 
-Conditional Handoff: Halts further detailed reviews if critical structural errors are detected, ensuring early feedback.
+* **Conditional Handoff:** Halts further detailed reviews if critical structural errors are detected, ensuring early feedback.
 
-Concurrent Detailed Reviews: If structural validation passes, it initiates parallel security reviews.
+* **Concurrent Detailed Reviews:** If structural validation passes, it initiates parallel security reviews.
 
-Report Consolidation: Synthesizes findings from all review stages into a single, cohesive final report.
+* **Report Consolidation:** Synthesizes findings from all review stages into a single, cohesive final report.
 
-Dynamic LLM Selection: Utilizes different Large Language Models (LLMs) optimized for specific tasks (e.g., faster/cheaper models for summarization, more powerful/multimodal models for complex reasoning and vision).
+* **Dynamic LLM Selection:** Utilizes different Large Language Models (LLMs) optimized for specific tasks (e.g., faster/cheaper models for summarization, more powerful/multimodal models for complex reasoning and vision).
 
-💡 Design Philosophy
-This prototype adopts a hybrid orchestration model to balance the intelligence of AI planners with the need for deterministic control in critical business workflows:
+## 💡 Design Philosophy
 
-Semantic Kernel's SequentialPlanner for High-Level Reasoning: The SequentialPlanner is used to interpret a natural language goal and propose a logical sequence of high-level steps (i.e., which agents/capabilities are needed and in what order). This leverages the LLM's ability to understand intent and map it to available tools.
+This prototype adopts a **hybrid orchestration model** to balance the intelligence of AI planners with the need for deterministic control in critical business workflows:
 
-Programmatic Control for Deterministic Logic: For complex conditional branching (like the "handoff" if critical errors are found) and explicit concurrent execution (for detailed reviews), the main.py script takes over. This ensures reliability, predictability, and easier debugging for crucial workflow decisions that current AI planners might not yet handle deterministically within their generated plans.
+* **Semantic Kernel's `SequentialPlanner` for High-Level Reasoning:** The `SequentialPlanner` is used to interpret a natural language goal and propose a logical sequence of high-level steps (i.e., which agents/capabilities are needed and in what order). This leverages the LLM's ability to understand intent and map it to available tools.
 
-First-Class sk.agent.Agent Components: Specialized review functions are encapsulated within custom Python classes that inherit from semantic_kernel.agent.Agent. This provides clear role definitions, enhances modularity, and aligns with the latest Semantic Kernel best practices for building autonomous agents.
+* **Programmatic Control for Deterministic Logic:** For complex conditional branching (like the "handoff" if critical errors are found) and explicit concurrent execution (for detailed reviews), the `main.py` script takes over. This ensures reliability, predictability, and easier debugging for crucial workflow decisions that current AI planners might not yet handle deterministically within their generated plans.
 
-Reusable Plugins (Tools): Common functionalities (like document parsing, image comprehension, rule loading) are implemented as standard Semantic Kernel plugins, making them discoverable and usable by any agent or function within the system via the central Kernel.
+* **First-Class `sk.agent.Agent` Components:** Specialized review functions are encapsulated within custom Python classes that inherit from `semantic_kernel.agent.Agent`. This provides clear role definitions, enhances modularity, and aligns with the latest Semantic Kernel best practices for building autonomous agents.
 
-🔄 Component Interaction Diagram
+* **Reusable Plugins (Tools):** Common functionalities (like document parsing, image comprehension, rule loading) are implemented as standard Semantic Kernel plugins, making them discoverable and usable by any agent or function within the system via the central `Kernel`.
+
+## 🔄 Component Interaction Diagram
+
+```mermaid
 graph TD
     A[User Goal / Document] --> B(main.py Orchestrator)
     B --> C{Initialize Kernel & Services}
@@ -88,44 +94,11 @@ graph TD
     style W fill:#fdf,stroke:#333,stroke-width:1px
     style X fill:#afa,stroke:#333,stroke-width:3px
     style Y fill:#fdf,stroke:#333,stroke-width:1px
+````
 
-Explanation of Flow:
+## 📦 Project Structure
 
-User Goal / Document: The process begins with a user-defined goal (e.g., "Review this architecture document") and the document itself.
-
-main.py Orchestrator: The central Python script that initializes the Semantic Kernel, configures services, and orchestrates the overall review process.
-
-Initialize Kernel & Services: The Semantic Kernel instance is created, and various Azure OpenAI LLM services (e.g., complex_llm for GPT-4o, fast_llm for GPT-3.5-turbo) are registered.
-
-Register Utility Plugins: Essential tools like DocumentParsingPlugin (for Azure Document Intelligence), ImageComprehensionPlugin (for Azure OpenAI Vision), and LocalRuleLoaderPlugin are added to the Kernel's global plugin collection.
-
-Initialize SK Agents: Instances of our specialized sk.agent.Agent subclasses (DocumentProcessorAgent, StructureValidatorAgent, etc.) are created. Each agent is configured with the Kernel and a specific LLM service ID.
-
-Register Agent Capabilities as Plugins for Planner: Crucially, the core methods of our sk.agent.Agent instances (e.g., DocumentProcessor.ProcessDocumentAndSummarize) are registered as KernelFunctions with the Kernel. This makes them discoverable by the SequentialPlanner.
-
-SequentialPlanner: The planner receives the user's high-level goal and, using the registered agent capabilities, generates a conceptual plan (a linear sequence of steps).
-
-Generated Plan (XML): The planner outputs an XML representation of its proposed sequence. This is printed for transparency but not directly executed for the entire workflow due to complex conditional/concurrent needs.
-
-main.py Interprets Plan & Executes: The main.py script then programmatically executes the steps, adding explicit conditional (if/else) and concurrent (asyncio.gather) logic based on the outcomes of previous steps.
-
-DocumentProcessor Agent: Invoked first to extract text and summarize the document. It uses DocParser (which calls Azure Document Intelligence) and ImageIntel (which calls Azure OpenAI Vision LLM). The summarization itself uses the fast_llm.
-
-StructuralValidator Agent: Receives the comprehensive summary and validates it against structural_rules.yaml (loaded via LocalRules plugin). It uses the complex_llm for its reasoning.
-
-Check for Critical Errors?: Based on the structural validation report, main.py makes a programmatic decision.
-
-YES (Handoff Pattern): If critical errors are found, the process immediately "hands off" to the LeadReviewer Agent to consolidate only the structural report and halt further detailed reviews.
-
-NO (Concurrent Pattern): If no critical errors, main.py initiates concurrent detailed reviews.
-
-SecurityArchitect Agent: Runs concurrently (along with any other detailed review agents) to assess the document's security. It uses the complex_llm.
-
-Consolidate Reports: Once all necessary reviews are complete, the LeadReviewer Agent consolidates all findings into the final architecture review document. It uses the complex_llm for synthesis.
-
-Final Architecture Review Document: The ultimate output of the orchestration.
-
-📦 Project Structure
+```
 .
 ├── .env                  # Environment variables for API keys
 ├── main.py               # Main orchestration script
@@ -144,85 +117,127 @@ Final Architecture Review Document: The ultimate output of the orchestration.
 │       └── local_rule_loader_plugin.py   # Loads local YAML rule files
 └── rules/
     └── structural_rules.yaml # Defines structural validation rules for architecture documents
+```
 
-🛠️ Installation Instructions
-Prerequisites
-Python 3.9+
+## 🛠️ Installation Instructions
 
-Azure Subscription:
+### Prerequisites
 
-Azure OpenAI Service: Deploy at least two models:
+  * **Python 3.9+**
 
-One for complex reasoning and multimodal tasks (e.g., gpt-4o or gpt-4). Note its deployment name.
+  * **Azure Subscription:**
 
-One for fast, text-only summarization (e.g., gpt-35-turbo). Note its deployment name.
+      * **Azure OpenAI Service:** Deploy at least two models:
 
-Azure AI Document Intelligence: Create a Document Intelligence resource. Note its endpoint and API key.
+          * One for **complex reasoning and multimodal tasks** (e.g., `gpt-4o` or `gpt-4`). Note its deployment name.
 
-Steps
-Clone the Repository:
+          * One for **fast, text-only summarization** (e.g., `gpt-35-turbo`). Note its deployment name.
 
-git clone <repository_url>
-cd <repository_name>
+      * **Azure AI Document Intelligence:** Create a Document Intelligence resource. Note its endpoint and API key.
 
-Create a Virtual Environment (Recommended):
+### Steps
 
-python -m venv .venv
-# On Windows:
-.venv\Scripts\activate
-# On macOS/Linux:
-source .venv/bin/activate
+1.  **Clone the Repository:**
 
-Install Dependencies:
+    ```bash
+    git clone <repository_url>
+    cd <repository_name>
+    ```
 
-pip install -r requirements.txt
+2.  **Create a Virtual Environment (Recommended):**
 
-(If requirements.txt is not provided, manually install the following):
+    ```bash
+    python -m venv .venv
+    # On Windows:
+    .venv\Scripts\activate
+    # On macOS/Linux:
+    source .venv/bin/activate
+    ```
 
-pip install semantic-kernel python-dotenv pyyaml azure-ai-formrecognizer
+3.  **Install Dependencies:**
 
-Configure Environment Variables:
-Create a file named .env in the root directory of your project and populate it with your Azure credentials:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-# .env
-AZURE_OPENAI_ENDPOINT="YOUR_AZURE_OPENAI_ENDPOINT"
-AZURE_OPENAI_API_KEY="YOUR_AZURE_OPENAI_API_KEY"
+    (If `requirements.txt` is not provided, manually install the following):
 
-# Deployment for complex tasks and vision (e.g., gpt-4o or gpt-4)
-AZURE_DEPLOYMENT_NAME_COMPLEX="YOUR_GPT_4O_OR_GPT_4_DEPLOYMENT_NAME" 
-# Deployment for fast/cheap text-only tasks (e.g., gpt-35-turbo)
-AZURE_DEPLOYMENT_NAME_FAST="YOUR_GPT_35_TURBO_DEPLOYMENT_NAME" 
+    ```bash
+    pip install semantic-kernel python-dotenv pyyaml azure-ai-formrecognizer
+    ```
 
-AZURE_DOC_INTEL_ENDPOINT="YOUR_AZURE_DOCUMENT_INTELLIGENCE_ENDPOINT"
-AZURE_DOC_INTEL_API_KEY="YOUR_AZURE_DOCUMENT_INTELLIGENCE_API_KEY"
+4.  **Configure Environment Variables:**
+    Create a file named `.env` in the root directory of your project and populate it with your Azure credentials. Remember to put all values in quotes.
 
-Replace the placeholder values with your actual Azure service details.
+    ```dotenv
+    # .env
+    AZURE_OPENAI_ENDPOINT="[https://your-openai-resource.openai.azure.com/](https://your-openai-resource.openai.azure.com/)"
+    AZURE_OPENAI_API_KEY="your_azure_openai_api_key_here"
+    AZURE_OPENAI_API_VERSION="2024-02-15-preview" # Or use another stable version like "2023-05-15"
 
-Prepare Sample Data:
-Create a directory named test_data/ in the root of your project.
-Place a sample PDF architecture design document (e.g., architecture_design.pdf) inside this test_data/ directory.
-Ensure the main.py script's document_to_review variable points to this file (e.g., document_to_review = "test_data/architecture_design.pdf").
+    # Deployment for complex tasks and vision
+    AZURE_DEPLOYMENT_NAME_COMPLEX="your-gpt4o-deployment"
+    AZURE_MODEL_ID_COMPLEX="gpt-4o" # e.g., gpt-4o, gpt-4-vision-preview, gpt-4
 
-Create Structural Rules File:
-Ensure the rules/structural_rules.yaml file exists with the content provided in the previous response.
+    # Deployment for fast/cheap text-only tasks
+    AZURE_DEPLOYMENT_NAME_FAST="your-gpt35-turbo-deployment"
+    AZURE_MODEL_ID_FAST="gpt-35-turbo" # e.g., gpt-35-turbo, gpt-35-turbo-16k
 
-Run the Application:
+    AZURE_DOC_INTEL_ENDPOINT="[https://your-doc-intel-resource.cognitiveservices.azure.com/](https://your-doc-intel-resource.cognitiveservices.azure.com/)"
+    AZURE_DOC_INTEL_API_KEY="your_azure_doc_intel_api_key_here"
+    ```
 
-python main.py
+    Replace the placeholder values with your actual Azure service details.
+
+5.  **Prepare Sample Data:**
+    Create a directory named `test_data/` in the root of your project.
+    Place a sample PDF architecture design document (e.g., `architecture_design.pdf`) inside this `test_data/` directory.
+    Ensure the `main.py` script's `document_to_review` variable points to this file (e.g., `document_to_review = "test_data/architecture_design.pdf"`).
+
+6.  **Create Structural Rules File:**
+    Ensure the `rules/structural_rules.yaml` file exists with the following content:
+
+    ```yaml
+    # rules/structural_rules.yaml
+    - id: SR-001
+      description: "Must contain an 'Architecture Diagram' or 'System Overview Diagram'."
+      critical: true
+    - id: SR-002
+      description: "Must contain a 'Business Context' or 'Problem Statement' section."
+      critical: true
+    - id: SR-003
+      description: "Must contain a 'Data Flow Diagram' or 'Data Model' description."
+      critical: true
+    - id: SR-004
+      description: "Must clearly define 'Security Considerations' or 'Security Design'."
+      critical: true
+    ```
+
+7.  **Run the Application:**
+
+    ```bash
+    python main.py
+    ```
 
 The orchestrator will then execute the review process, printing progress and the final architecture review document to the console.
 
-🚀 Future Enhancements & Considerations
-More Robust Error Handling: Implement more granular error handling and retry mechanisms for external API calls and LLM interactions.
+## 🚀 Future Enhancements & Considerations
 
-User Interface: Develop a web-based UI (e.g., with Flask/FastAPI backend and React/Vue frontend) to provide a more interactive experience for uploading documents, viewing progress, and reviewing reports.
+  * **More Robust Error Handling:** Implement more granular error handling and retry mechanisms for external API calls and LLM interactions.
 
-Advanced Planner Integration: As Semantic Kernel's planners evolve, explore deeper integration of complex conditional and concurrent logic directly within the planner's execution capabilities, potentially reducing the need for explicit programmatic control in main.py.
+  * **User Interface:** Develop a web-based UI (e.g., with Flask/FastAPI backend and React/Vue frontend) to provide a more interactive experience for uploading documents, viewing progress, and reviewing reports.
 
-Additional Review Agents: Expand the system with more specialized agents (e.g., Cost Optimization Agent, Performance Review Agent, Data Governance Agent).
+  * **Advanced Planner Integration:** As Semantic Kernel's planners evolve, explore deeper integration of complex conditional and concurrent logic directly within the planner's execution capabilities, potentially reducing the need for explicit programmatic control in `main.py`.
 
-Human-in-the-Loop: Introduce mechanisms for human intervention and approval at critical stages of the review process.
+  * **Additional Review Agents:** Expand the system with more specialized agents (e.g., Cost Optimization Agent, Performance Review Agent, Data Governance Agent).
 
-Memory and State Management: Implement more sophisticated memory management for agents to retain context across multiple interactions or long-running processes.
+  * **Human-in-the-Loop:** Introduce mechanisms for human intervention and approval at critical stages of the review process.
 
-Output Formats: Allow the final report to be generated in various formats (e.g., Markdown, HTML, DOCX).
+  * **Memory and State Management:** Implement more sophisticated memory management for agents to retain context across multiple interactions or long-running processes.
+
+  * **Output Formats:** Allow the final report to be generated in various formats (e.g., Markdown, HTML, DOCX).
+
+<!-- end list -->
+
+```
+```
