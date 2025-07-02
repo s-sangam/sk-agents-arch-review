@@ -94,7 +94,7 @@ graph TD
     style W fill:#fdf,stroke:#333,stroke-width:1px
     style X fill:#afa,stroke:#333,stroke-width:3px
     style Y fill:#fdf,stroke:#333,stroke-width:1px
-````
+```
 
 ## 📦 Project Structure
 
