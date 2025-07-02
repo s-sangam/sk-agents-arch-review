@@ -1,0 +1,13 @@
+# rules/structural_rules.yaml
+- id: SR-001
+  description: "Must contain an 'Architecture Diagram' or 'System Overview Diagram'."
+  critical: true
+- id: SR-002
+  description: "Must contain a 'Business Context' or 'Problem Statement' section."
+  critical: true
+- id: SR-003
+  description: "Must contain a 'Data Flow Diagram' or 'Data Model' description."
+  critical: true
+- id: SR-004
+  description: "Must clearly define 'Security Considerations' or 'Security Design'."
+  critical: true

@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+.Python
+env/
+.venv/
+myenv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment variables
+.env
+
+# IDEs and editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
+*~
+.ipynb_checkpoints/ # If Jupyter notebooks are used
+
+# Azure specific (if any local Azure SDK caches or temp files)
+.azure/
+.azclirc
+
+# Output directories (if any generated)
+# For this project, 'test_data/' contains input PDFs, so it's not ignored.
+# If you generate new PDFs or other large outputs, add their directories here.
+# For example:
+# output/
+# generated_reports/

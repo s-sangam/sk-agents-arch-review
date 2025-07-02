@@ -1,0 +1,7 @@
+semantic-kernel             # The core library for agents.
+python-dotenv               # For loading environment variables.
+azure-ai-formrecognizer     # Azure AI Document Intelligence SDK.
+openai                      # Azure OpenAI and GPT-4o API access.
+pypdf                       # To load PDF files locally (used for reading bytes).
+Pillow                      # For image handling (e.g., base64 encoding).
+pyyaml                      # For reading YAML configuration files.
