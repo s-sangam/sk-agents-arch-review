@@ -37,35 +37,35 @@ This prototype adopts a **hybrid orchestration model** to balance the intelligen
 
 ```mermaid
 graph TD
-    A[User Goal / Document] --> B(main.py Orchestrator)
-    B --> C{Initialize Kernel & Services}
-    C --> D[Register Utility Plugins]
-    D --> E[Initialize SK Agents]
-    E --> F[Register Agent Capabilities as Plugins for Planner]
+    A["User Goal / Document"] --> B["main.py Orchestrator"]
+    B --> C["Initialize Kernel & Services"]
+    C --> D["Register Utility Plugins"]
+    D --> E["Initialize SK Agents"]
+    E --> F["Register Agent Capabilities as Plugins for Planner"]
 
-    F --> G(SequentialPlanner)
-    G -- "Analyzes Goal & Available Capabilities" --> H[Generated Plan (XML)]
-    H --> I{main.py Interprets Plan & Executes}
+    F --> G["SequentialPlanner"]
+    G -- "Analyzes Goal & Available Capabilities" --> H["Generated Plan (XML)"]
+    H --> I["main.py Interprets Plan & Executes"]
 
-    I -- "Step 1: Document Processing" --> J(DocumentProcessor Agent)
-    J --> K[DocParser Plugin]
-    J --> L[ImageIntel Plugin]
-    K --> M[Azure Doc Intelligence]
-    L --> N[Azure OpenAI Vision LLM]
-    J -- "Comprehensive Summary" --> O[Output]
+    I -- "Step 1: Document Processing" --> J["DocumentProcessor Agent"]
+    J --> K["DocParser Plugin"]
+    J --> L["ImageIntel Plugin"]
+    K --> M["Azure Doc Intelligence"]
+    L --> N["Azure OpenAI Vision LLM"]
+    J -- "Comprehensive Summary" --> O["Output"]
 
-    O --> P(StructureValidator Agent)
-    P --> Q[LocalRules Plugin]
-    Q --> R[structural_rules.yaml]
-    P -- "Structural Validation Report (JSON)" --> S{Check for Critical Errors?}
+    O --> P["StructureValidator Agent"]
+    P --> Q["LocalRules Plugin"]
+    Q --> R["structural_rules.yaml"]
+    P -- "Structural Validation Report (JSON)" --> S{"Check for Critical Errors?"}
 
-    S -- "YES (Handoff Pattern)" --> T[LeadReviewer Agent]
-    S -- "NO (Concurrent Pattern)" --> U[SecurityArchitect Agent]
-    U --> V[Azure OpenAI Complex LLM]
-    U -- "Security Review Report" --> W[Output]
+    S -- "YES (Handoff Pattern)" --> T["LeadReviewer Agent"]
+    S -- "NO (Concurrent Pattern)" --> U["SecurityArchitect Agent"]
+    U --> V["Azure OpenAI Complex LLM"]
+    U -- "Security Review Report" --> W["Output"]
 
-    T -- "Consolidate Structural Report" --> X(Final Architecture Review Document)
-    W --> Y(Consolidate Reports)
+    T -- "Consolidate Structural Report" --> X["Final Architecture Review Document"]
+    W --> Y["Consolidate Reports"]
     Y --> T
     T --> X
 
